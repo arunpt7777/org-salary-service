@@ -1,5 +1,7 @@
 package com.motta.salary_service.entity;
 
+import javax.validation.constraints.Size;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,17 +20,22 @@ public class Salary {
 	@NotEmpty(message = "Currency must not be empty")
 	private String currency;
 
-	@NotEmpty(message = "Amount must not be empty")
-	private Double amount;
+	@Size(min = 1, message = "Salary per day must not be empty")
+	private Double salaryPerDay;
+
+	@Size(min = 1, message = "Total Salary must not be empty")
+	private Double totalSalary;
 
 	public Salary() {
 	}
 
-	public Salary(Integer id, String currency, Double amount) {
+	public Salary(Integer id, @NotEmpty(message = "Currency must not be empty") String currency, Double salaryPerDay,
+			Double totalSalary) {
 		super();
 		this.id = id;
 		this.currency = currency;
-		this.amount = amount;
+		this.salaryPerDay = salaryPerDay;
+		this.totalSalary = totalSalary;
 	}
 
 	public Integer getId() {
@@ -47,16 +54,26 @@ public class Salary {
 		this.currency = currency;
 	}
 
-	public Double getAmount() {
-		return amount;
+	public Double getSalaryPerDay() {
+		return salaryPerDay;
 	}
 
-	public void setAmount(Double amount) {
-		this.amount = amount;
+	public void setSalaryPerDay(Double salaryPerDay) {
+		this.salaryPerDay = salaryPerDay;
+	}
+
+	public Double getTotalSalary() {
+		return totalSalary;
+	}
+
+	public void setTotalSalary(Double totalSalary) {
+		this.totalSalary = totalSalary;
 	}
 
 	@Override
 	public String toString() {
-		return "Salary [id=" + id + ", currency=" + currency + ", amount=" + amount + "]";
+		return "Salary [id=" + id + ", currency=" + currency + ", salaryPerDay=" + salaryPerDay + ", totalSalary="
+				+ totalSalary + "]";
 	}
+
 }

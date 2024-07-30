@@ -18,4 +18,6 @@ public interface SalaryService {
 
 	List<SalaryDTO> retrieveAllSalariesByCurrency(String currency);
 
+	SalaryDTO calculateSalary(Integer employeeId);
+
 }

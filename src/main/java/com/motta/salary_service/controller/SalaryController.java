@@ -70,9 +70,19 @@ public class SalaryController {
 	}
 
 	// Retrieve All Salaries by currency REST API
-	@GetMapping("/salariesByCurrency/{currency}")
-	public ResponseEntity<List<SalaryDTO>> getAllSalariesByGender(@PathVariable("gender") String currency) {
-		List<SalaryDTO> maleSalaries = salaryService.retrieveAllSalariesByCurrency(currency);
-		return new ResponseEntity<>(maleSalaries, HttpStatus.OK);
+	@GetMapping("/salariesbycurrency/{currency}")
+	public ResponseEntity<List<SalaryDTO>> getAllSalariesByCurrency(@PathVariable("currency") String currency) {
+		List<SalaryDTO> salariesByCurrency = salaryService.retrieveAllSalariesByCurrency(currency);
+		return new ResponseEntity<>(salariesByCurrency, HttpStatus.OK);
 	}
+
+	// Retrieve Salary for a given EmployeeId
+	@GetMapping("/calculatesalary/{employeeId}")
+	public SalaryDTO calculateSalary(@PathVariable("employeeId") Integer employeeId) {
+
+		SalaryDTO salaryDTO = salaryService.calculateSalary(employeeId);
+		return salaryDTO;
+
+	}
+
 }

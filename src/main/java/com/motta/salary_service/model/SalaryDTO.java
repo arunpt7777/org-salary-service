@@ -6,16 +6,19 @@ public class SalaryDTO {
 
 	private String currency;
 
-	private Double amount;
+	private Double salaryPerDay;
+
+	private Double totalSalary;
 
 	public SalaryDTO() {
 	}
 
-	public SalaryDTO(Integer id, String currency, Double amount) {
+	public SalaryDTO(Integer id, String currency, Double salaryPerDay, Double totalSalary) {
 		super();
 		this.id = id;
 		this.currency = currency;
-		this.amount = amount;
+		this.salaryPerDay = salaryPerDay;
+		this.totalSalary = totalSalary;
 	}
 
 	public Integer getId() {
@@ -34,17 +37,26 @@ public class SalaryDTO {
 		this.currency = currency;
 	}
 
-	public Double getAmount() {
-		return amount;
+	public Double getSalaryPerDay() {
+		return salaryPerDay;
 	}
 
-	public void setAmount(Double amount) {
-		this.amount = amount;
+	public void setSalaryPerDay(Double salaryPerDay) {
+		this.salaryPerDay = salaryPerDay;
+	}
+
+	public Double getTotalSalary() {
+		return totalSalary;
+	}
+
+	public void setTotalSalary(Double totalSalary) {
+		this.totalSalary = totalSalary;
 	}
 
 	@Override
 	public String toString() {
-		return "SalaryDTO [id=" + id + ", currency=" + currency + ", amount=" + amount + "]";
+		return "SalaryDTO [id=" + id + ", currency=" + currency + ", salaryPerDay=" + salaryPerDay + ", totalSalary="
+				+ totalSalary + "]";
 	}
 
 }

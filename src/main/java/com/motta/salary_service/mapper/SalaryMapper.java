@@ -7,13 +7,15 @@ public class SalaryMapper {
 
 	// Convert Salary JPA Entity into SalaryDTO
 	public static SalaryDTO mapToSalaryDTO(Salary salary) {
-		SalaryDTO salaryDTO = new SalaryDTO(salary.getId(), salary.getCurrency(), salary.getAmount());
+		SalaryDTO salaryDTO = new SalaryDTO(salary.getId(), salary.getCurrency(), salary.getSalaryPerDay(),
+				salary.getTotalSalary());
 		return salaryDTO;
 	}
 
 	// Convert SalaryDTO into Salary JPA Entity
 	public static Salary mapToSalary(SalaryDTO salaryDTO) {
-		Salary salary = new Salary(salaryDTO.getId(), salaryDTO.getCurrency(), salaryDTO.getAmount());
+		Salary salary = new Salary(salaryDTO.getId(), salaryDTO.getCurrency(), salaryDTO.getSalaryPerDay(),
+				salaryDTO.getTotalSalary());
 		return salary;
 	}
 }
