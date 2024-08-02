@@ -38,6 +38,14 @@ public class CustomisedResponseEntityExceptionHandler extends ResponseEntityExce
 				request.getDescription(false));
 
 		return new ResponseEntity(errorDetails, HttpStatus.BAD_REQUEST);
+	}
 
+
+	@ExceptionHandler(InvalidSalaryException.class)
+	public final ResponseEntity<ErrorDetails> handleInvalidSalaryException(Exception ex, WebRequest request)
+			throws Exception {
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+				request.getDescription(false));
+		return new ResponseEntity(errorDetails, HttpStatus.NOT_FOUND);
 	}
 }

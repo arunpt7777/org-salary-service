@@ -4,16 +4,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.motta.salary_service.exception.*;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.motta.salary_service.entity.Salary;
-import com.motta.salary_service.exception.AttendanceNotFoundException;
-import com.motta.salary_service.exception.EmployeeNotFoundException;
-import com.motta.salary_service.exception.SalaryAlreadyExistsException;
-import com.motta.salary_service.exception.SalaryNotFoundException;
 import com.motta.salary_service.mapper.SalaryMapper;
 import com.motta.salary_service.model.AttendanceDTO;
 import com.motta.salary_service.model.EmployeeDTO;
@@ -24,7 +25,19 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 public class SalaryServiceImplementation implements SalaryService {
+
+	private static final Logger log = LoggerFactory.getLogger(SalaryServiceImplementation.class);
+
+	@Value("${salary.id.initialValue}")
+	private Integer initialValueOfPrimaryKey;
+
+	@Value("${salary.per.day.min}")
+	private Integer salaryPerDayMin;
+
+	@Value("${salary.total.min}")
+	private Integer salaryTotalMin;
 
 	@Autowired
 	private SalaryRepository repository;
@@ -34,21 +47,24 @@ public class SalaryServiceImplementation implements SalaryService {
 
 		// CHeck if id already exists
 		Optional<Salary> salary = repository.findById(salaryDTO.getId());
+		log.info("Association id = {} not found.", salaryDTO.getId());
+
 		if (salary.isPresent())
 			throw new SalaryAlreadyExistsException("Salary id = " + salaryDTO.getId() + " already Exists!");
 
 		// Convert SalaryDTO into User JPA Entity
 		Salary newSalary = SalaryMapper.mapToSalary(salaryDTO);
 		Salary savedSalary = repository.save(newSalary);
+		log.info("Salary id = {} has been persisted.", newSalary.getId());
 
 		// Convert Salary JPA entity to UserDto
-		SalaryDTO savedSalaryDTO = SalaryMapper.mapToSalaryDTO(savedSalary);
-		return savedSalaryDTO;
+        return SalaryMapper.mapToSalaryDTO(savedSalary);
 	}
 
 	@Override
 	public SalaryDTO retrieveSalaryById(Integer id) {
 		Salary salary = repository.findById(id).get();
+		log.error("Salary id = {} not found. Please enter different id", id);
 		if (salary == null)
 			throw new SalaryNotFoundException("Salary id = " + id + " not found. Please enter different id");
 		return SalaryMapper.mapToSalaryDTO(salary);
@@ -63,15 +79,14 @@ public class SalaryServiceImplementation implements SalaryService {
 	@Override
 	public SalaryDTO updateSalary(SalaryDTO salaryDTO) {
 		Salary existingSalary = repository.findById(salaryDTO.getId()).get();
-		if (existingSalary == null)
-			throw new SalaryNotFoundException(
-					"Salary id = " + salaryDTO.getId() + " not found. Please enter different id");
+		log.info("Salary id = {} has been fetched.", salaryDTO.getId());
 
-		existingSalary.setSalaryPerDay(salaryDTO.getSalaryPerDay());
+        existingSalary.setSalaryPerDay(salaryDTO.getSalaryPerDay());
 		existingSalary.setTotalSalary(salaryDTO.getTotalSalary());
 		existingSalary.setCurrency(salaryDTO.getCurrency());
 
 		Salary updatedSalary = repository.save(existingSalary);
+		log.info("Updating Salary id = {} is complete.", existingSalary.getId());
 		return SalaryMapper.mapToSalaryDTO(updatedSalary);
 	}
 
@@ -105,6 +120,7 @@ public class SalaryServiceImplementation implements SalaryService {
 				.getForEntity("http://localhost:8000/salaries/{salaryId}", SalaryDTO.class, salaryId);
 		SalaryDTO salaryDTO = salaryResponseEntity.getBody();
 		if (salaryDTO == null) {
+			log.error("Fetching salary id = {} has failed.", salaryDTO.getId());
 			throw new SalaryNotFoundException("Salary not found");
 		}
 
@@ -114,6 +130,7 @@ public class SalaryServiceImplementation implements SalaryService {
 		AttendanceDTO attendanceDTO = attendancResponseEntity.getBody();
 
 		if (attendanceDTO == null) {
+			log.error("Fetching Attendance id has failed.");
 			throw new AttendanceNotFoundException("Attendance not found");
 		}
 
@@ -122,4 +139,33 @@ public class SalaryServiceImplementation implements SalaryService {
 		salaryDTO.setTotalSalary(totalSalary);
 		return salaryDTO;
 	}
+
+	@Override
+	public void validateSalaryDTO(SalaryDTO salaryDTO) {
+
+		if (salaryDTO.getId()==null) {
+			throw new InvalidSalaryException("Salary Id is mandatory");
+		}
+
+		if (salaryDTO.getId()<initialValueOfPrimaryKey) {
+			throw new InvalidSalaryException("Salary Id must not be less than the initial value of: " + initialValueOfPrimaryKey);
+		}
+
+		if (salaryDTO.getCurrency()==null) {
+			throw new InvalidSalaryException("Currency is mandatory");
+		}
+		if (salaryDTO.getSalaryPerDay()==null) {
+			throw new InvalidSalaryException("Salary Per Day is mandatory");
+		}
+
+		if (salaryDTO.getSalaryPerDay()<salaryPerDayMin) {
+			throw new InvalidSalaryException("Salary Per Day is mandatory");
+		}
+
+		if (salaryDTO.getTotalSalary()<salaryTotalMin) {
+			throw new InvalidSalaryException("Total Salary is mandatory");
+		}
+
+	}
+
 }

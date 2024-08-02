@@ -20,4 +20,5 @@ public interface SalaryService {
 
 	SalaryDTO calculateSalary(Integer employeeId);
 
+	void validateSalaryDTO(SalaryDTO salaryDTO);
 }
