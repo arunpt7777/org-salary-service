@@ -10,7 +10,7 @@ import com.motta.salary_service.exception.AttendanceNotFoundException;
 import com.motta.salary_service.exception.SalaryNotFoundException;
 import com.motta.salary_service.model.AttendanceDTO;
 
-@RestController
+@RestController("salary_calculation_controller")
 public class SalaryCalculationController {
 
 	// Method to calculate total Salary by getting number of working days from
